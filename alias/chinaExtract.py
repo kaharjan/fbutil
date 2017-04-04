@@ -21,6 +21,7 @@ def mid(s):
         return s[27:]
 
 def main(dumpf, midsf, namef, aliasf,lang):
+    midDict={}
     mid_set = read_mids(midsf)
     name_fh = open(namef, 'w')
     name_lang = open(namef+"."+lang,'w')
@@ -34,23 +35,22 @@ def main(dumpf, midsf, namef, aliasf,lang):
         if len(fields) != 4:
             log.warn('Unexpected format: %s' % line)
         s, p, o, t = fields
-        if mid(s) in mid_set:
+        sMid=mid(s)
+        if sMid in mid_set:
             p = p.strip('<>')
-            if p.endswith('type.object.name'):
-                name_fh.write(line)
-		if "@"+lang in o:
-		    name_lang.write(line)
-            elif p.endswith('common.topic.alias'):
-                alias_fh.write(line)
-	        if "@"+lang in o:
-                    alias_lang.write(line) 
+            if not p.endswith('type.object.name'):
+                if not p.endswith('common.topic.alias'):
+                   midDict[sMid+"\t"+p]=o
+    for key,val in midDict:
+        name_lang.write(key+"\t"+val+"\n")
+
     log.info('all line is %i\n ..done.'%i)
 
 if __name__ == '__main__':
     import argparse
-    p = argparse.ArgumentParser(description='Extract names/aliases from FB')
+    p = argparse.ArgumentParser(description='Extract relation associate with China from FB')
     p.add_argument('dump', help='Path to Freebase RDF dump file')
-    p.add_argument('mids', help='List of MIDs to extract')
+    p.add_argument('mids', help='List of MIDs (type.object.name contains China) to extract')
     p.add_argument('names', help='Output file for names')
     p.add_argument('aliases', help='Output file for aliases')
     p.add_argument('lang', help='language for names from FB')

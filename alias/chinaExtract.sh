@@ -8,10 +8,20 @@ echo "Usage: filename lang(freebase gzip file name  without extenstion .gz"
 
 
 
-DUMP=$1
-FN=`echo $DUMP | sed 's/.*\///'`
+FILE=$1
+FN=`echo $FILE | sed 's/.*\///'`
 
-grep 'China' $1 >$1".China"
+grep 'China' $FILE >$FILE.China
+
+cat $FILE.China | cut -f1,3 \
+    | cut -f1,3 \
+    | sed 's/<http\:\/\/rdf\.freebase\.com\/ns\/\([^>]*\)>/\1/' \
+    >$FILE.China.terse
+
+MIDS=$FILE.China.mid
+cat $FILE.China | sed 's/^<http\:\/\/rdf\.freebase\.com\/ns\/\(m\.[^>]*\)>.*/\1/' \
+    > $MIDS
+
 
 python extract.py \
     $DUMP.gz \
