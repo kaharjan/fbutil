@@ -20,10 +20,12 @@ def mid(s):
     if s.startswith('http://rdf.freebase.com/ns/m.'):
         return s[27:]
 
-def main(dumpf, midsf, namef, aliasf):
+def main(dumpf, midsf, namef, aliasf,lang):
     mid_set = read_mids(midsf)
     name_fh = open(namef, 'w')
+    name_lang = open(namef+"."+lang,'w')
     alias_fh = open(aliasf, 'w')
+    alias_lang = open(aliasf+"."+lang,'w')
     log.info('Scanning dump for names/aliases..')
     for i, line in enumerate(gzip.open(dumpf, 'rb')):
         if i % 1000000 == 0:
@@ -36,9 +38,13 @@ def main(dumpf, midsf, namef, aliasf):
             p = p.strip('<>')
             if p.endswith('type.object.name'):
                 name_fh.write(line)
+		if "@"+lang in o:
+		    name_lang.write(line)
             elif p.endswith('common.topic.alias'):
                 alias_fh.write(line)
-    log.info('..done.')
+	        if "@"+lang in o:
+                    alias_lang.write(line) 
+    log.info('all line is %i\n ..done.'%i)
 
 if __name__ == '__main__':
     import argparse
@@ -47,6 +53,9 @@ if __name__ == '__main__':
     p.add_argument('mids', help='List of MIDs to extract')
     p.add_argument('names', help='Output file for names')
     p.add_argument('aliases', help='Output file for aliases')
+    p.add_argument('lang', help='language for names from FB')
     args = p.parse_args()
-    main(args.dump, args.mids, args.names, args.aliases)
+    main(args.dump, args.mids, args.names, args.aliases,args.lang)
+
+
 

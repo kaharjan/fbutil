@@ -2,8 +2,10 @@
 #
 # Script to extract names and aliases from Freebase RDF dump
 
-DUMP=/data/freebase/freebase-rdf-2013-12-01-00-00 # SETME
-
+#DUMP=/data/disk2/kaharjan/kaharFreebaseData/fb-rdf-10k-head.nt # SETME
+#DUMP=/data/disk2/kaharjan/kaharFreebaseData/fb-10M-head.txt # SETME
+echo "Usage: filename lang(freebase gzip file name  without extenstion .gz"
+DUMP=$1
 FN=`echo $DUMP | sed 's/.*\///'`
 
 ENWP=$FN.enwp
@@ -25,9 +27,12 @@ python extract.py \
     $DUMP.gz \
     $MIDS.gz \
     $NAMES \
-    $ALIASES
+    $ALIASES\
+    $2
 gzip $NAMES
 gzip $ALIASES
+gzip $NMES$2
+gzip $ALIASE$2
 
 gunzip -c $NAMES.gz \
     | cut -f1,3 \
